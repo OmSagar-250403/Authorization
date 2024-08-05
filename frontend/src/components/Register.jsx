@@ -1,13 +1,17 @@
 import React from 'react'
+import { useState } from 'react';
 import { Link } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 import { useFormik } from 'formik';
-import { passwordValidate } from '../helper/validate';
+import { registerValidation } from '../helper/validate.js';
 import avatar from '../assets/profile.png';
+import convertToBase64 from '../helper/convert.js';
 
 import styles from "../styles/Username.module.css"
 
 const Register = () => {
+
+    const [file, setFile] = useState()
 
   const formik = useFormik({
     initialValues : {
@@ -15,19 +19,20 @@ const Register = () => {
         username: 'example123',
         password : 'admin@123'
     },
-    validate : passwordValidate,
+    validate : registerValidation,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit : async values => {
+        values = await Object.assign(values, { profile : file || ''})
       console.log(values)
     }
   })
 
     /** formik doensn't support file upload so we need to create this handler */
-    /*const onUpload = async e => {
+    const onUpload = async e => {
         const base64 = await convertToBase64(e.target.files[0]);
         setFile(base64);
-      }*/
+      }
 
   return (
 
@@ -36,7 +41,7 @@ const Register = () => {
         <Toaster position='top-center' reverseOrder={false}></Toaster>
 
         <div className='flex justify-center items-center h-screen'>
-            <div className={styles.glass} style={{ width: "30%", height:"86%",paddingTop: '3em'}}>
+            <div className={styles.glass} style={{ width: "30%", height:"90%",paddingTop: '3em'}}>
 
             <div className="title flex flex-col items-center -mt-6"> 
                 <h4 className='text-5xl font-bold'>Register</h4>
@@ -48,10 +53,10 @@ const Register = () => {
                 <form className='py-1' onSubmit={formik.handleSubmit}>
                     <div className='profile flex justify-center py-4'>
                         <label htmlFor="profile">
-                        <img src={avatar} className={styles.profile_img} alt="avatar" />
+                        <img src={file || avatar} className={styles.profile_img} alt="avatar" />
                         </label>
                         
-                        <input  /*onChange={onUpload}*/ type="file" id='profile' name='profile' />
+                        <input  onChange={onUpload} type="file" id='profile' name='profile' />
                     </div>
 
                     <div className="textbox flex flex-col items-center gap-6">
